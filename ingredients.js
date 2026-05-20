@@ -1,24 +1,22 @@
 const API_URL = "https://vinaccord-back.onrender.com";
-// const API_URL = "http://127.0.0.1:5000"; // ← décommenter pour local
+// const API_URL = "http://127.0.0.1:5000";
 
-const form         = document.getElementById("ingredientForm");
-const input        = document.getElementById("ingredientInput");
-const chipsWrap    = document.getElementById("chipsWrap");
+const form           = document.getElementById("ingredientForm");
+const input          = document.getElementById("ingredientInput");
+const chipsWrap      = document.getElementById("chipsWrap");
 const chipsContainer = document.getElementById("ingredientChips");
-const findBtn      = document.getElementById("findBtn");
-const loader       = document.getElementById("loader");
-const results      = document.getElementById("results");
-const resultDish   = document.getElementById("resultDish");
-const wineList     = document.getElementById("wineList");
-const resultSrc    = document.getElementById("resultSource");
-const errorBox     = document.getElementById("errorBox");
-const errorMsg     = document.getElementById("errorMsg");
+const findBtn        = document.getElementById("findBtn");
+const loader         = document.getElementById("loader");
+const results        = document.getElementById("results");
+const resultDish     = document.getElementById("resultDish");
+const wineList       = document.getElementById("wineList");
+const resultSrc      = document.getElementById("resultSource");
+const errorBox       = document.getElementById("errorBox");
+const errorMsg       = document.getElementById("errorMsg");
 
 const DEFAULT_MSG = "Ajoutez vos ingrédients un par un, en français ou en anglais.";
-
 let ingredients = [];
 
-// ── Chips ─────────────────────────────────────────────────────────────────────
 form.addEventListener("submit", e => {
   e.preventDefault();
   const val = input.value.trim();
@@ -30,22 +28,16 @@ form.addEventListener("submit", e => {
 
 function renderChips() {
   chipsWrap.hidden = ingredients.length === 0;
-  chipsContainer.innerHTML = ingredients
-    .map((ing, i) => `
-      <span class="ing-chip">
-        ${ing}
-        <button class="ing-chip-remove" data-index="${i}" aria-label="Supprimer">✕</button>
-      </span>
-    `).join("");
+  chipsContainer.innerHTML = ingredients.map((ing, i) => `
+    <span class="ing-chip">
+      ${ing}
+      <button class="ing-chip-remove" data-index="${i}" aria-label="Supprimer">✕</button>
+    </span>`).join("");
   chipsContainer.querySelectorAll(".ing-chip-remove").forEach(btn =>
-    btn.addEventListener("click", () => {
-      ingredients.splice(parseInt(btn.dataset.index), 1);
-      renderChips();
-    })
+    btn.addEventListener("click", () => { ingredients.splice(parseInt(btn.dataset.index), 1); renderChips(); })
   );
 }
 
-// ── Affichage ─────────────────────────────────────────────────────────────────
 function setErrorBox(msg, isError = false) {
   errorMsg.textContent = msg;
   errorBox.style.borderColor = isError ? "#F5C0C0" : "#E8E1D9";
@@ -56,11 +48,9 @@ function showLoader()  { loader.hidden = false; results.hidden = true; setErrorB
 function showResults() { loader.hidden = true;  results.hidden = false; setErrorBox(DEFAULT_MSG); }
 function showError(m)  { loader.hidden = true;  results.hidden = true;  setErrorBox(m, true); }
 
-// ── Recherche par ingrédients ─────────────────────────────────────────────────
 findBtn.addEventListener("click", async () => {
   if (ingredients.length === 0) { setErrorBox("Ajoutez au moins un ingrédient !", true); return; }
   showLoader();
-
   try {
     const res  = await fetch(`${API_URL}/recommend`, {
       method: "POST",
@@ -68,18 +58,24 @@ findBtn.addEventListener("click", async () => {
       body: JSON.stringify({ ingredients }),
     });
     const data = await res.json();
-
     if (!res.ok) { showError(data.error || "Une erreur est survenue."); return; }
 
     resultDish.textContent = `Ingrédients : ${ingredients.join(", ")}`;
-    wineList.innerHTML = data.vins
-      .map(v => `<li class="wine-item"><span class="wine-dot"></span><span class="wine-name">${v}</span></li>`)
-      .join("");
 
-    resultSrc.textContent = data.couleur
-      ? `🎨 Profil dominant : ${data.couleur}`
-      : "🔍 Analyse par ingrédients";
+    wineList.innerHTML = data.vins.map(v => {
+      const mots = data.mots_cles && data.mots_cles[v] ? data.mots_cles[v] : [];
+      const badges = mots.map(m => `<span class="badge">${m}</span>`).join("");
+      return `
+        <li class="wine-item">
+          <span class="wine-dot"></span>
+          <div class="wine-info">
+            <span class="wine-name">${v}</span>
+            ${badges ? `<div class="wine-badges">${badges}</div>` : ""}
+          </div>
+        </li>`;
+    }).join("");
 
+    resultSrc.textContent = data.couleur ? `🎨 Profil dominant : ${data.couleur}` : "🔍 Analyse par ingrédients";
     showResults();
   } catch {
     showError("Impossible de joindre le serveur.");
