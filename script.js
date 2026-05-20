@@ -1,11 +1,9 @@
+const API_URL = "https://vinaccord-back.onrender.com";
+// const API_URL = "http://127.0.0.1:5000"; // ← décommenter pour local
 
-// ── Config ────────────────────────────────────────────────────────────────────
-//const API_URL = "http://127.0.0.1:5000";  // ← en local
-const API_URL = "https://vinaccord-back.onrender.com/";  // ← décommenter pour Render
-
-// ── Références DOM ────────────────────────────────────────────────────────────
 const form        = document.getElementById("searchForm");
 const input       = document.getElementById("searchInput");
+const dropdown    = document.getElementById("dropdown");
 const loader      = document.getElementById("loader");
 const results     = document.getElementById("results");
 const resultDish  = document.getElementById("resultDish");
@@ -39,36 +37,64 @@ function renderHistory() {
   );
 }
 
+// ── Dropdown autocomplétion ───────────────────────────────────────────────────
+let debounceTimer = null;
+
+input.addEventListener("input", () => {
+  clearTimeout(debounceTimer);
+  const q = input.value.trim();
+  if (q.length < 2) { closeDropdown(); return; }
+  debounceTimer = setTimeout(() => fetchSuggestions(q), 250);
+});
+
+async function fetchSuggestions(q) {
+  try {
+    const res  = await fetch(`${API_URL}/search?q=${encodeURIComponent(q)}`);
+    const data = await res.json();
+    renderDropdown(data);
+  } catch { closeDropdown(); }
+}
+
+function renderDropdown(suggestions) {
+  if (!suggestions.length) { closeDropdown(); return; }
+  dropdown.hidden = false;
+  dropdown.innerHTML = suggestions
+    .map(s => `<li class="dropdown-item" tabindex="0">${s}</li>`)
+    .join("");
+  dropdown.querySelectorAll(".dropdown-item").forEach(item => {
+    item.addEventListener("mousedown", (e) => {
+      e.preventDefault();
+      input.value = item.textContent;
+      closeDropdown();
+    });
+  });
+}
+
+function closeDropdown() {
+  dropdown.hidden = true;
+  dropdown.innerHTML = "";
+}
+
+document.addEventListener("click", (e) => {
+  if (!form.contains(e.target)) closeDropdown();
+});
+
 // ── Affichage ─────────────────────────────────────────────────────────────────
-function setErrorBox(message, isError = false) {
-  errorMsg.textContent = message;
+function setErrorBox(msg, isError = false) {
+  errorMsg.textContent = msg;
   errorBox.style.borderColor = isError ? "#F5C0C0" : "#E8E1D9";
   errorBox.style.background  = isError ? "#FFF5F5" : "#F9F7F4";
 }
 
-function showLoader() {
-  loader.hidden  = false;
-  results.hidden = true;
-  setErrorBox(DEFAULT_MSG, false);
-}
+function showLoader()  { loader.hidden = false; results.hidden = true; setErrorBox(DEFAULT_MSG); }
+function showResults() { loader.hidden = true;  results.hidden = false; setErrorBox(DEFAULT_MSG); }
+function showError(m)  { loader.hidden = true;  results.hidden = true;  setErrorBox(m, true); }
 
-function showResults() {
-  loader.hidden  = true;
-  results.hidden = false;
-  setErrorBox(DEFAULT_MSG, false);
-}
-
-function showError(message) {
-  loader.hidden  = true;
-  results.hidden = true;
-  setErrorBox(message, true);
-}
-
-// ── Recherche principale ──────────────────────────────────────────────────────
+// ── Recherche ─────────────────────────────────────────────────────────────────
 async function doSearch(query) {
   const plat = query.trim();
   if (!plat) return;
-
+  closeDropdown();
   showLoader();
 
   try {
@@ -79,35 +105,22 @@ async function doSearch(query) {
     });
     const data = await res.json();
 
-    if (!res.ok) {
-      showError(data.error || "Une erreur est survenue.");
-      return;
-    }
+    if (!res.ok) { showError(data.error || "Une erreur est survenue."); return; }
 
     resultDish.textContent = data.plat;
     wineList.innerHTML = data.vins
       .map(v => `<li class="wine-item"><span class="wine-dot"></span><span class="wine-name">${v}</span></li>`)
       .join("");
 
-    const sourceLabel = {
-      "expert":      "✅ Accord expert",
-      "ingredients": "🔍 Analyse Spoonacular",
-      "claude":      "🤖 Analyse Claude AI"
-    };
-    resultSrc.textContent = sourceLabel[data.source] || data.source;
+    const labels = { expert: "Accord testé", ingredients: "Analyse avec Spoonacular", claude: "Analyse par poids" };
+    resultSrc.textContent = labels[data.source] || data.source;
 
     showResults();
     saveHistory(plat);
-
-  } catch (err) {
-    showError("Impossible de joindre le serveur. Vérifiez que Flask tourne en local.");
+  } catch {
+    showError("Impossible de joindre le serveur.");
   }
 }
 
-// ── Événements ────────────────────────────────────────────────────────────────
-form.addEventListener("submit", e => {
-  e.preventDefault();
-  doSearch(input.value);
-});
-
+form.addEventListener("submit", e => { e.preventDefault(); doSearch(input.value); });
 renderHistory();
