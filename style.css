@@ -1,14 +1,14 @@
 :root {
-  --burgundy:  #6B1F2A;
+  --burgundy: #6B1F2A;
   --burgundy2: #8C2D3B;
-  --gold:      #C5A55A;
-  --bg:        #F9F7F4;
-  --card-bg:   #FFFFFF;
-  --text:      #1A1A1A;
-  --muted:     #6E6360;
-  --border:    #E8E1D9;
-  --radius:    14px;
-  --shadow:    0 8px 32px rgba(107,31,42,.10);
+  --gold: #C5A55A;
+  --bg: #F9F7F4;
+  --card-bg: #FFFFFF;
+  --text: #1A1A1A;
+  --muted: #6E6360;
+  --border: #E8E1D9;
+  --radius: 14px;
+  --shadow: 0 8px 32px rgba(107,31,42,.10);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -23,19 +23,42 @@ body {
   flex-direction: column;
 }
 
-.site-header { padding: 1.4rem 2rem; display: flex; align-items: center; }
+/* ── Header & Nav ─────────────────────────────────────────────────────────── */
+.site-header {
+  padding: 1.2rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+}
 .logo { display: flex; align-items: center; gap: .5rem; }
 .logo-icon { font-size: 1.5rem; }
 .logo-text { font-family: "Playfair Display", serif; font-size: 1.25rem; color: var(--burgundy); letter-spacing: -.5px; }
 .logo-text strong { font-weight: 700; }
 
+.site-nav { display: flex; gap: .5rem; }
+.nav-link {
+  padding: .45rem 1rem;
+  border-radius: 50px;
+  font-size: .88rem;
+  font-weight: 500;
+  color: var(--muted);
+  text-decoration: none;
+  border: 1.5px solid transparent;
+  transition: all .2s;
+}
+.nav-link:hover { color: var(--burgundy); border-color: var(--border); }
+.nav-link.active { color: var(--burgundy); background: #fff; border-color: var(--border); box-shadow: var(--shadow); }
+
 main { flex: 1; }
 
+/* ── Hero ─────────────────────────────────────────────────────────────────── */
 .hero { text-align: center; padding: 4rem 1.5rem 3rem; }
 .hero-sub { font-size: .95rem; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-bottom: .8rem; }
 .hero-title { font-family: "Playfair Display", serif; font-size: clamp(2rem, 5vw, 3.4rem); color: var(--burgundy); line-height: 1.15; margin-bottom: 2.4rem; }
 
-.search-form { width: 100%; max-width: 600px; margin: 0 auto; }
+/* ── Search ───────────────────────────────────────────────────────────────── */
+.search-form { width: 100%; max-width: 600px; margin: 0 auto; position: relative; }
 .search-wrap {
   display: flex; align-items: center;
   background: var(--card-bg); border: 1.5px solid var(--border);
@@ -46,9 +69,61 @@ main { flex: 1; }
 .search-input { flex: 1; border: none; outline: none; font-size: 1.05rem; font-family: "Inter", sans-serif; color: var(--text); background: transparent; padding: .55rem 0; }
 .search-input::placeholder { color: #B0A8A3; }
 .search-btn { background: var(--burgundy); color: #fff; border: none; border-radius: 40px; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: background .2s, transform .15s; }
-.search-btn:hover  { background: var(--burgundy2); }
+.search-btn:hover { background: var(--burgundy2); }
 .search-btn:active { transform: scale(.96); }
 
+/* ── Dropdown ─────────────────────────────────────────────────────────────── */
+.dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0; right: 0;
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  list-style: none;
+  z-index: 100;
+  overflow: hidden;
+  animation: fadeUp .15s ease both;
+}
+.dropdown-item {
+  padding: .85rem 1.5rem;
+  font-size: .95rem;
+  cursor: pointer;
+  color: var(--text);
+  transition: background .12s;
+  text-align: left;
+}
+.dropdown-item:hover, .dropdown-item:focus { background: var(--bg); color: var(--burgundy); outline: none; }
+
+/* ── Chips ingrédients ────────────────────────────────────────────────────── */
+.chips-wrap { margin-top: 1.5rem; display: flex; flex-direction: column; align-items: center; gap: 1.2rem; }
+.ingredient-chips { display: flex; flex-wrap: wrap; gap: .5rem; justify-content: center; max-width: 600px; }
+.ing-chip {
+  display: inline-flex; align-items: center; gap: .4rem;
+  background: var(--card-bg); border: 1.5px solid var(--border);
+  border-radius: 50px; padding: .35rem .9rem;
+  font-size: .88rem; color: var(--burgundy);
+  animation: fadeUp .2s ease both;
+}
+.ing-chip-remove {
+  background: none; border: none; cursor: pointer;
+  color: var(--muted); font-size: .75rem; padding: 0;
+  transition: color .15s;
+}
+.ing-chip-remove:hover { color: var(--burgundy); }
+.find-btn {
+  background: var(--burgundy); color: #fff;
+  border: none; border-radius: 50px;
+  padding: .75rem 2rem; font-size: 1rem;
+  font-family: "Inter", sans-serif; font-weight: 500;
+  cursor: pointer; transition: background .2s, transform .15s;
+  box-shadow: var(--shadow);
+}
+.find-btn:hover { background: var(--burgundy2); }
+.find-btn:active { transform: scale(.97); }
+
+/* ── Loader ───────────────────────────────────────────────────────────────── */
 .loader-wrap { display: flex; flex-direction: column; align-items: center; gap: 1rem; padding: 3rem 1rem; }
 .loader-dots { display: flex; gap: .5rem; }
 .loader-dots span { width: 10px; height: 10px; border-radius: 50%; background: var(--burgundy); animation: bounce .7s infinite alternate; }
@@ -57,6 +132,7 @@ main { flex: 1; }
 @keyframes bounce { to { transform: translateY(-10px); opacity: .4; } }
 .loader-text { color: var(--muted); font-size: .9rem; }
 
+/* ── Results ──────────────────────────────────────────────────────────────── */
 .results { padding: 0 1.5rem 3rem; }
 .results-inner { max-width: 600px; margin: 0 auto; text-align: center; }
 .results-dish { font-size: .8rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.2rem; }
@@ -68,21 +144,28 @@ main { flex: 1; }
 .wine-name { font-family: "Playfair Display", serif; font-size: 1.1rem; color: var(--burgundy); text-align: left; }
 .results-source { margin-top: 1.2rem; font-size: .78rem; color: var(--muted); letter-spacing: .04em; }
 
-.error-box { max-width: 520px; margin: 0 auto 2rem; padding: 1.2rem 1.5rem; background: #FFF5F5; border: 1.5px solid #F5C0C0; border-radius: var(--radius); display: flex; align-items: center; gap: .8rem; animation: fadeUp .3s ease both; }
+/* ── Error box ────────────────────────────────────────────────────────────── */
+.error-box { max-width: 520px; margin: 0 auto 2rem; padding: 1.2rem 1.5rem; background: #F9F7F4; border: 1.5px solid #E8E1D9; border-radius: var(--radius); display: flex; align-items: center; gap: .8rem; }
 .error-icon { font-size: 1.3rem; }
-.error-msg  { font-size: .95rem; color: #8B2020; }
+.error-msg { font-size: .95rem; color: var(--muted); }
 
+/* ── History ──────────────────────────────────────────────────────────────── */
 .history-section { max-width: 600px; margin: 0 auto; padding: 0 1.5rem 3rem; }
 .history-title { font-size: .78rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: .8rem; }
 .history-chips { display: flex; flex-wrap: wrap; gap: .5rem; }
 .chip { background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 50px; padding: .35rem .9rem; font-size: .88rem; color: var(--burgundy); cursor: pointer; transition: background .15s, border-color .15s; }
 .chip:hover { background: var(--burgundy); color: #fff; border-color: var(--burgundy); }
 
+/* ── Footer ───────────────────────────────────────────────────────────────── */
 .site-footer { text-align: center; padding: 1.2rem; font-size: .78rem; color: var(--muted); border-top: 1px solid var(--border); }
 .site-footer span { color: var(--burgundy); font-weight: 500; }
 
+/* ── Responsive ───────────────────────────────────────────────────────────── */
 @media (max-width: 480px) {
   .hero { padding: 3rem 1rem 2rem; }
   .search-wrap { padding-left: 1rem; }
   .wine-name { font-size: 1rem; }
+  .site-header { padding: 1rem; }
+  .site-nav { gap: .3rem; }
+  .nav-link { padding: .35rem .7rem; font-size: .8rem; }
 }
