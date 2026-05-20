@@ -127,13 +127,25 @@ main { flex: 1; }
 .find-btn:active { transform: scale(.97); }
 
 /* ── Loader ── */
-.loader-wrap { display: flex; flex-direction: column; align-items: center; gap: 1rem; padding: 3rem 1rem; }
-.loader-dots { display: flex; gap: .5rem; }
-.loader-dots span { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,.7); animation: bounce .7s infinite alternate; }
-.loader-dots span:nth-child(2) { animation-delay: .15s; }
-.loader-dots span:nth-child(3) { animation-delay: .3s; }
-@keyframes bounce { to { transform: translateY(-10px); opacity: .4; } }
-.loader-text { color: rgba(255,255,255,.6); font-size: .9rem; }
+.loader-wrap { display: flex; flex-direction: column; align-items: center; gap: .8rem; padding: 3rem 1rem; }
+.loader-glass {
+  font-size: 2.2rem;
+  display: block;
+  animation: sway 1.4s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+@keyframes sway {
+  0%   { transform: rotate(-8deg); }
+  50%  { transform: rotate(8deg); }
+  100% { transform: rotate(-8deg); }
+}
+.loader-text {
+  font-family: "Playfair Display", serif;
+  font-style: italic;
+  color: rgba(255,255,255,.65);
+  font-size: 1rem;
+  letter-spacing: .02em;
+}
 
 /* ── Results ── */
 .results { padding: 0 1.5rem 3rem; }
