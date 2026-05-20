@@ -1,4 +1,3 @@
-# ── style.css avec badges mots-clés + dropdown headers ───────────────────────
 :root {
   --burgundy: #6B1F2A;
   --burgundy2: #8C2D3B;
@@ -198,4 +197,3 @@ main { flex: 1; }
   .site-nav { gap: .3rem; }
   .nav-link { padding: .35rem .7rem; font-size: .8rem; }
 }
-
