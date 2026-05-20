@@ -67,6 +67,22 @@
       <p class="history-title">Recherches récentes</p>
       <div class="history-chips" id="historyChips"></div>
     </section>
+
+    <section class="contrib-section">
+      <div class="contrib-card">
+        <p class="contrib-sub">Partager un accord</p>
+        <h2 class="contrib-title">Vous avez un bon accord mets &amp; vin ?</h2>
+        <p class="contrib-text">Partagez-le et racontez votre expérience.</p>
+        <form id="contribForm" class="contrib-form" autocomplete="off" novalidate>
+          <input id="contribName"  class="contrib-input" type="text"  placeholder="Votre prénom" required />
+          <input id="contribDish"  class="contrib-input" type="text"  placeholder="Le plat" required />
+          <input id="contribWine"  class="contrib-input" type="text"  placeholder="Le vin" required />
+          <textarea id="contribStory" class="contrib-textarea" placeholder="Racontez votre expérience…" rows="5" required></textarea>
+          <button type="submit" class="contrib-btn">Envoyer mon accord 🍷</button>
+        </form>
+        <p id="contribMsg" class="contrib-message" hidden></p>
+      </div>
+    </section>
   </main>
 
   <footer class="site-footer">

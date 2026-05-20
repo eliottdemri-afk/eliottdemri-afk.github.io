@@ -14,8 +14,15 @@ const errorMsg    = document.getElementById("errorMsg");
 const histSection = document.getElementById("historySection");
 const histChips   = document.getElementById("historyChips");
 
+const contribForm  = document.getElementById("contribForm");
+const contribName  = document.getElementById("contribName");
+const contribDish  = document.getElementById("contribDish");
+const contribWine  = document.getElementById("contribWine");
+const contribStory = document.getElementById("contribStory");
+const contribMsg   = document.getElementById("contribMsg");
+
 const MAX_HIST    = 6;
-const DEFAULT_MSG = "Astuce : vous pouvez rechercher en français ou en anglais.";
+const DEFAULT_MSG = "Astuce : vous pouvez rechercher en français ou en anglais.";
 
 let searchHistory = JSON.parse(localStorage.getItem("vin_history") || "[]");
 
@@ -36,61 +43,34 @@ function renderHistory() {
   );
 }
 
-let timerBdd = null;
-let timerSpoon = null;
-let currentBdd = [];
-let currentSpoon = [];
+let timer = null;
 
 input.addEventListener("input", () => {
   const q = input.value.trim();
-  clearTimeout(timerBdd);
-  clearTimeout(timerSpoon);
-  currentBdd = [];
-  currentSpoon = [];
+  clearTimeout(timer);
   closeDropdown();
-
   if (q.length < 2) return;
 
-  timerBdd = setTimeout(async () => {
+  timer = setTimeout(async () => {
     try {
-      const res  = await fetch(`${API_URL}/search?q=${encodeURIComponent(q)}&source=bdd`);
+      const res  = await fetch(`${API_URL}/search?q=${encodeURIComponent(q)}`);
       const data = await res.json();
-      currentBdd = data.bdd || [];
-      renderDropdown();
+      const bdd  = data.bdd || [];
+      if (!bdd.length) { closeDropdown(); return; }
+      let html = `<li class="dropdown-header">✅ Accords personnellement testés</li>`;
+      html += bdd.map(s => `<li class="dropdown-item" tabindex="0">${s}</li>`).join("");
+      dropdown.hidden = false;
+      dropdown.innerHTML = html;
+      dropdown.querySelectorAll(".dropdown-item").forEach(item => {
+        item.addEventListener("mousedown", e => {
+          e.preventDefault();
+          input.value = item.textContent;
+          closeDropdown();
+        });
+      });
     } catch { }
   }, 250);
-
-  timerSpoon = setTimeout(async () => {
-    try {
-      const res  = await fetch(`${API_URL}/search?q=${encodeURIComponent(q)}&source=spoonacular`);
-      const data = await res.json();
-      currentSpoon = data.spoonacular || [];
-      renderDropdown();
-    } catch { }
-  }, 1000);
 });
-
-function renderDropdown() {
-  if (!currentBdd.length && !currentSpoon.length) { closeDropdown(); return; }
-  let html = "";
-  if (currentBdd.length) {
-    html += `<li class="dropdown-header">✅ Accords personnellement testés</li>`;
-    html += currentBdd.map(s => `<li class="dropdown-item" tabindex="0">${s}</li>`).join("");
-  }
-  if (currentSpoon.length) {
-    html += `<li class="dropdown-header">🔍 Suggestions Spoonacular</li>`;
-    html += currentSpoon.map(s => `<li class="dropdown-item" tabindex="0">${s}</li>`).join("");
-  }
-  dropdown.hidden = false;
-  dropdown.innerHTML = html;
-  dropdown.querySelectorAll(".dropdown-item").forEach(item => {
-    item.addEventListener("mousedown", e => {
-      e.preventDefault();
-      input.value = item.textContent;
-      closeDropdown();
-    });
-  });
-}
 
 function closeDropdown() {
   dropdown.hidden = true;
@@ -131,7 +111,7 @@ async function doSearch(query) {
     const labels = {
       expert: "✅ Accord personnellement testé",
       ingredients: "🔍 Analyse Spoonacular",
-      claude: "✨ Analyse Gemini"
+      gemini: "✨ Suggestion Gemini"
     };
     resultSrc.textContent = labels[data.source] || data.source;
     showResults();
@@ -143,3 +123,44 @@ async function doSearch(query) {
 
 form.addEventListener("submit", e => { e.preventDefault(); doSearch(input.value); });
 renderHistory();
+
+// ── Formulaire contribution ──
+if (contribForm) {
+  contribForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = contribForm.querySelector(".contrib-btn");
+
+    contribMsg.hidden = true;
+    contribMsg.className = "contrib-message";
+    btn.disabled = true;
+    btn.textContent = "Envoi en cours…";
+
+    try {
+      const res = await fetch(`${API_URL}/contribution`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prenom:     contribName.value.trim(),
+          plat:       contribDish.value.trim(),
+          vin:        contribWine.value.trim(),
+          experience: contribStory.value.trim()
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        contribMsg.textContent = data.error || "Impossible d'envoyer votre contribution.";
+        contribMsg.classList.add("error");
+      } else {
+        contribMsg.textContent = "🍷 Merci ! Votre accord a bien été reçu.";
+        contribForm.reset();
+      }
+    } catch {
+      contribMsg.textContent = "Serveur indisponible, réessayez plus tard.";
+      contribMsg.classList.add("error");
+    } finally {
+      contribMsg.hidden = false;
+      btn.disabled = false;
+      btn.textContent = "Envoyer mon accord 🍷";
+    }
+  });
+}
