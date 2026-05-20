@@ -1,5 +1,5 @@
 # ── style.css avec badges mots-clés + dropdown headers ───────────────────────
-root {
+:root {
   --burgundy: #6B1F2A;
   --burgundy2: #8C2D3B;
   --gold: #C5A55A;
