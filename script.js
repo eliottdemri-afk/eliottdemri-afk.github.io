@@ -74,7 +74,7 @@ function renderDropdown() {
   if (!currentBdd.length && !currentSpoon.length) { closeDropdown(); return; }
   let html = "";
   if (currentBdd.length) {
-    html += `<li class="dropdown-header">✅ Accords experts</li>`;
+    html += `<li class="dropdown-header">✅ Accords personnellement testés</li>`;
     html += currentBdd.map(s => `<li class="dropdown-item" tabindex="0">${s}</li>`).join("");
   }
   if (currentSpoon.length) {
@@ -101,8 +101,8 @@ document.addEventListener("click", e => { if (!form.contains(e.target)) closeDro
 
 function setErrorBox(msg, isError = false) {
   errorMsg.textContent = msg;
-  errorBox.style.borderColor = isError ? "#F5C0C0" : "#E8E1D9";
-  errorBox.style.background  = isError ? "#FFF5F5" : "#F9F7F4";
+  errorBox.style.borderColor = isError ? "#F5C0C0" : "rgba(255,255,255,.2)";
+  errorBox.style.background  = isError ? "rgba(200,0,0,.15)" : "rgba(255,255,255,.08)";
 }
 
 function showLoader()  { loader.hidden = false; results.hidden = true; setErrorBox(DEFAULT_MSG); }
@@ -124,11 +124,15 @@ async function doSearch(query) {
     if (!res.ok) { showError(data.error || "Une erreur est survenue."); return; }
     resultDish.textContent = data.plat;
     wineList.innerHTML = data.vins.map(v => {
-      const mots = data.mots_cles && data.mots_cles[v] ? data.mots_cles[v] : [];
-      const badges = mots.map(m => `<span class="badge">${m}</span>`).join("");
-      return `<li class="wine-item"><span class="wine-dot"></span><div class="wine-info"><span class="wine-name">${v}</span>${badges ? `<div class="wine-badges">${badges}</div>` : ""}</div></li>`;
+      const mots = (data.mots_cles && data.mots_cles[v]) ? data.mots_cles[v] : [];
+      const badges = mots.length > 0 ? `<div class="wine-badges">${mots.map(m => `<span class="badge">${m}</span>`).join("")}</div>` : "";
+      return `<li class="wine-item"><span class="wine-dot"></span><div class="wine-info"><span class="wine-name">${v}</span>${badges}</div></li>`;
     }).join("");
-    const labels = { expert: "✅ Accord expert", ingredients: "🔍 Analyse Spoonacular" };
+    const labels = {
+      expert: "✅ Accord personnellement testé",
+      ingredients: "🔍 Analyse Spoonacular",
+      claude: "✨ Analyse Gemini"
+    };
     resultSrc.textContent = labels[data.source] || data.source;
     showResults();
     saveHistory(plat);

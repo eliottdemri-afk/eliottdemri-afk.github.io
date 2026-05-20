@@ -105,7 +105,7 @@ main { flex: 1; }
 }
 .dropdown-item:hover, .dropdown-item:focus { background: var(--bg); color: var(--burgundy); outline: none; }
 
-/* ── Chips ingr\u00e9dients ── */
+/* ── Chips ingrédients ── */
 .chips-wrap { margin-top: 1.5rem; display: flex; flex-direction: column; align-items: center; gap: 1.2rem; }
 .ingredient-chips { display: flex; flex-wrap: wrap; gap: .5rem; justify-content: center; max-width: 600px; }
 .ing-chip {
@@ -154,7 +154,7 @@ main { flex: 1; }
 .wine-info { display: flex; flex-direction: column; gap: .45rem; }
 .wine-name { font-family: "Playfair Display", serif; font-size: 1.1rem; color: var(--burgundy); }
 
-/* ── Badges mots-cl\u00e9s ── */
+/* ── Badges mots-clés ── */
 .wine-badges { display: flex; flex-wrap: wrap; gap: .35rem; }
 .badge {
   background: #F3EDE4; color: var(--muted);
@@ -165,7 +165,7 @@ main { flex: 1; }
 .results-source { margin-top: 1.2rem; font-size: .78rem; color: rgba(255,255,255,.5); letter-spacing: .04em; }
 
 /* ── Error box ── */
-.error-box { max-width: 520px; margin: 0 auto 2rem; padding: 1.2rem 1.5rem; background: rgba(255,255,255,.1); border: 1.5px solid rgba(255,255,255,.2); border-radius: var(--radius); display: flex; align-items: center; gap: .8rem; }
+.error-box { max-width: 520px; margin: 0 auto 2rem; padding: 1.2rem 1.5rem; background: rgba(255,255,255,.08); border: 1.5px solid rgba(255,255,255,.15); border-radius: var(--radius); display: flex; align-items: center; gap: .8rem; }
 .error-icon { font-size: 1.3rem; }
 .error-msg { font-size: .95rem; color: rgba(255,255,255,.75); }
 
@@ -173,8 +173,15 @@ main { flex: 1; }
 .history-section { max-width: 600px; margin: 0 auto; padding: 0 1.5rem 3rem; }
 .history-title { font-size: .78rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.5); margin-bottom: .8rem; }
 .history-chips { display: flex; flex-wrap: wrap; gap: .5rem; }
-.chip { background: rgba(255,255,255,.12); border: 1.5px solid rgba(255,255,255,.2); border-radius: 50px; padding: .35rem .9rem; font-size: .88rem; color: rgba(255,255,255,.85); cursor: pointer; transition: background .15s, border-color .15s; }
-.chip:hover { background: rgba(255,255,255,.25); border-color: rgba(255,255,255,.4); }
+.chip {
+  background: rgba(255,255,255,.12);
+  border: 1.5px solid rgba(255,255,255,.25);
+  border-radius: 50px; padding: .35rem .9rem;
+  font-size: .88rem; color: rgba(255,255,255,.85);
+  cursor: pointer; transition: background .15s, border-color .15s;
+}
+.chip:hover { background: rgba(255,255,255,.25); border-color: rgba(255,255,255,.5); }
+.chip:active { background: #fff; color: var(--burgundy); border-color: #fff; }
 
 /* ── Footer ── */
 .site-footer { text-align: center; padding: 1.2rem; font-size: .78rem; color: rgba(255,255,255,.4); border-top: 1px solid rgba(255,255,255,.1); }
