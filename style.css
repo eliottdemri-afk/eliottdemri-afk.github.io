@@ -1,5 +1,5 @@
 # ── style.css avec badges mots-clés + dropdown headers ───────────────────────
-style_css = ''':root {
+root {
   --burgundy: #6B1F2A;
   --burgundy2: #8C2D3B;
   --gold: #C5A55A;
@@ -198,26 +198,4 @@ main { flex: 1; }
   .site-nav { gap: .3rem; }
   .nav-link { padding: .35rem .7rem; font-size: .8rem; }
 }
-'''
 
-with open("output/vinaccord-front/style.css", "w", encoding="utf-8") as f:
-    f.write(style_css)
-
-# Copier les fichiers HTML inchangés
-shutil.copy("output/index.html", "output/vinaccord-front/index.html")
-shutil.copy("output/ingredients.html", "output/vinaccord-front/ingredients.html")
-
-print("style.css OK")
-print("index.html OK (copié)")
-print("ingredients.html OK (copié)")
-
-# Récap final
-print("\n=== vinaccord-back/ ===")
-for f in sorted(os.listdir("output/vinaccord-back")):
-    size = os.path.getsize(f"output/vinaccord-back/{f}")
-    print(f"  {f}  ({size} bytes)")
-
-print("\n=== vinaccord-front/ ===")
-for f in sorted(os.listdir("output/vinaccord-front")):
-    size = os.path.getsize(f"output/vinaccord-front/{f}")
-    print(f"  {f}  ({size} bytes)")
