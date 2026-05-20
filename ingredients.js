@@ -28,11 +28,7 @@ form.addEventListener("submit", e => {
 
 function renderChips() {
   chipsWrap.hidden = ingredients.length === 0;
-  chipsContainer.innerHTML = ingredients.map((ing, i) => `
-    <span class="ing-chip">
-      ${ing}
-      <button class="ing-chip-remove" data-index="${i}" aria-label="Supprimer">✕</button>
-    </span>`).join("");
+  chipsContainer.innerHTML = ingredients.map((ing, i) => `<span class="ing-chip">${ing}<button class="ing-chip-remove" data-index="${i}" aria-label="Supprimer">✕</button></span>`).join("");
   chipsContainer.querySelectorAll(".ing-chip-remove").forEach(btn =>
     btn.addEventListener("click", () => { ingredients.splice(parseInt(btn.dataset.index), 1); renderChips(); })
   );
@@ -52,29 +48,19 @@ findBtn.addEventListener("click", async () => {
   if (ingredients.length === 0) { setErrorBox("Ajoutez au moins un ingrédient !", true); return; }
   showLoader();
   try {
-    const res  = await fetch(`${API_URL}/recommend`, {
+    const res = await fetch(`${API_URL}/recommend`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ingredients }),
     });
     const data = await res.json();
     if (!res.ok) { showError(data.error || "Une erreur est survenue."); return; }
-
     resultDish.textContent = `Ingrédients : ${ingredients.join(", ")}`;
-
     wineList.innerHTML = data.vins.map(v => {
       const mots = data.mots_cles && data.mots_cles[v] ? data.mots_cles[v] : [];
       const badges = mots.map(m => `<span class="badge">${m}</span>`).join("");
-      return `
-        <li class="wine-item">
-          <span class="wine-dot"></span>
-          <div class="wine-info">
-            <span class="wine-name">${v}</span>
-            ${badges ? `<div class="wine-badges">${badges}</div>` : ""}
-          </div>
-        </li>`;
+      return `<li class="wine-item"><span class="wine-dot"></span><div class="wine-info"><span class="wine-name">${v}</span>${badges ? `<div class="wine-badges">${badges}</div>` : ""}</div></li>`;
     }).join("");
-
     resultSrc.textContent = data.couleur ? `🎨 Profil dominant : ${data.couleur}` : "🔍 Analyse par ingrédients";
     showResults();
   } catch {
