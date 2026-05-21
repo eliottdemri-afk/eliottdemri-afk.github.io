@@ -1,5 +1,4 @@
 const API_URL = "https://vinaccord-back.onrender.com";
-// const API_URL = "http://127.0.0.1:5000";
 
 const form        = document.getElementById("searchForm");
 const input       = document.getElementById("searchInput");
@@ -13,7 +12,6 @@ const errorBox    = document.getElementById("errorBox");
 const errorMsg    = document.getElementById("errorMsg");
 const histSection = document.getElementById("historySection");
 const histChips   = document.getElementById("historyChips");
-
 const suggestBox    = document.getElementById("suggestBox");
 const suggestForm   = document.getElementById("suggestForm");
 const suggestPrenom = document.getElementById("suggestPrenom");
@@ -21,7 +19,6 @@ const suggestNom    = document.getElementById("suggestNom");
 const suggestEmail  = document.getElementById("suggestEmail");
 const suggestPlat   = document.getElementById("suggestPlat");
 const suggestMsg    = document.getElementById("suggestMsg");
-
 const contribForm  = document.getElementById("contribForm");
 const contribName  = document.getElementById("contribName");
 const contribDish  = document.getElementById("contribDish");
@@ -29,9 +26,7 @@ const contribWine  = document.getElementById("contribWine");
 const contribStory = document.getElementById("contribStory");
 const contribMsg   = document.getElementById("contribMsg");
 
-const MAX_HIST    = 6;
-const DEFAULT_MSG = "Astuce : vous pouvez rechercher en français ou en anglais.";
-
+const MAX_HIST = 6;
 let searchHistory = JSON.parse(localStorage.getItem("vin_history") || "[]");
 
 function saveHistory(plat) {
@@ -43,22 +38,18 @@ function saveHistory(plat) {
 function renderHistory() {
   if (!searchHistory.length) { histSection.hidden = true; return; }
   histSection.hidden = false;
-  histChips.innerHTML = searchHistory
-    .map(p => `<button class="chip" type="button">${p}</button>`)
-    .join("");
+  histChips.innerHTML = searchHistory.map(p => `<button class="chip" type="button">${p}</button>`).join("");
   histChips.querySelectorAll(".chip").forEach(btn =>
     btn.addEventListener("click", () => { input.value = btn.textContent; doSearch(btn.textContent); })
   );
 }
 
 let timer = null;
-
 input.addEventListener("input", () => {
   const q = input.value.trim();
   clearTimeout(timer);
   closeDropdown();
   if (q.length < 2) return;
-
   timer = setTimeout(async () => {
     try {
       const res  = await fetch(`${API_URL}/search?q=${encodeURIComponent(q)}`);
@@ -70,46 +61,25 @@ input.addEventListener("input", () => {
       dropdown.hidden = false;
       dropdown.innerHTML = html;
       dropdown.querySelectorAll(".dropdown-item").forEach(item => {
-        item.addEventListener("mousedown", e => {
-          e.preventDefault();
-          input.value = item.textContent;
-          closeDropdown();
-        });
+        item.addEventListener("mousedown", e => { e.preventDefault(); input.value = item.textContent; closeDropdown(); });
       });
     } catch { }
   }, 250);
 });
 
-function closeDropdown() {
-  dropdown.hidden = true;
-  dropdown.innerHTML = "";
-}
-
+function closeDropdown() { dropdown.hidden = true; dropdown.innerHTML = ""; }
 document.addEventListener("click", e => { if (!form.contains(e.target)) closeDropdown(); });
 
-function setErrorBox(msg, isError = false) {
-  errorMsg.textContent = msg;
-  errorBox.style.borderColor = isError ? "#F5C0C0" : "rgba(255,255,255,.2)";
-  errorBox.style.background  = isError ? "rgba(200,0,0,.15)" : "rgba(255,255,255,.08)";
+function hideAll() {
+  loader.hidden = true;
+  results.hidden = true;
+  errorBox.hidden = true;
+  suggestBox.hidden = true;
 }
 
-function showLoader() {
-  loader.hidden = false;
-  results.hidden = true;
-  suggestBox.hidden = true;
-  setErrorBox(DEFAULT_MSG);
-}
-function showResults() {
-  loader.hidden = true;
-  results.hidden = false;
-  suggestBox.hidden = true;
-  setErrorBox(DEFAULT_MSG);
-}
-function showError(m) {
-  loader.hidden = true;
-  results.hidden = true;
-  setErrorBox(m, true);
-}
+function showLoader()  { hideAll(); loader.hidden = false; }
+function showResults() { hideAll(); results.hidden = false; }
+function showError(m)  { hideAll(); errorMsg.textContent = m; errorBox.hidden = false; }
 
 async function doSearch(query) {
   const plat = query.trim();
@@ -125,14 +95,12 @@ async function doSearch(query) {
     const data = await res.json();
 
     if (res.status === 404) {
-      showError(data.error || "Plat non trouvé.");
-      // Affiche le bloc suggestion
+      hideAll();
       suggestPlat.value = plat;
       suggestPrenom.value = "";
       suggestNom.value = "";
       suggestEmail.value = "";
       suggestMsg.hidden = true;
-      suggestMsg.textContent = "";
       suggestBox.hidden = false;
       return;
     }
@@ -145,11 +113,7 @@ async function doSearch(query) {
       const badges = mots.length > 0 ? `<div class="wine-badges">${mots.map(m => `<span class="badge">${m}</span>`).join("")}</div>` : "";
       return `<li class="wine-item"><span class="wine-dot"></span><div class="wine-info"><span class="wine-name">${v}</span>${badges}</div></li>`;
     }).join("");
-    const labels = {
-      expert: "✅ Accord personnellement testé",
-      ingredients: "🔍 Analyse Spoonacular",
-      gemini: "✨ Suggestion Gemini"
-    };
+    const labels = { expert: "✅ Accord personnellement testé", ingredients: "🔍 Analyse Spoonacular", gemini: "✨ Suggestion Gemini" };
     resultSrc.textContent = labels[data.source] || data.source;
     showResults();
     saveHistory(plat);
@@ -161,7 +125,6 @@ async function doSearch(query) {
 form.addEventListener("submit", e => { e.preventDefault(); doSearch(input.value); });
 renderHistory();
 
-// ── Formulaire suggestion plat manquant ──
 if (suggestForm) {
   suggestForm.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -169,17 +132,11 @@ if (suggestForm) {
     suggestMsg.hidden = true;
     btn.disabled = true;
     btn.textContent = "Envoi en cours…";
-
     try {
       const res = await fetch(`${API_URL}/suggestion`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prenom: suggestPrenom.value.trim(),
-          nom:    suggestNom.value.trim(),
-          email:  suggestEmail.value.trim(),
-          plat:   suggestPlat.value.trim()
-        })
+        body: JSON.stringify({ prenom: suggestPrenom.value.trim(), nom: suggestNom.value.trim(), email: suggestEmail.value.trim(), plat: suggestPlat.value.trim() })
       });
       const data = await res.json();
       if (!res.ok) {
@@ -201,7 +158,6 @@ if (suggestForm) {
   });
 }
 
-// ── Formulaire contribution ──
 if (contribForm) {
   contribForm.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -210,17 +166,11 @@ if (contribForm) {
     contribMsg.className = "contrib-message";
     btn.disabled = true;
     btn.textContent = "Envoi en cours…";
-
     try {
       const res = await fetch(`${API_URL}/contribution`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prenom:     contribName.value.trim(),
-          plat:       contribDish.value.trim(),
-          vin:        contribWine.value.trim(),
-          experience: contribStory.value.trim()
-        })
+        body: JSON.stringify({ prenom: contribName.value.trim(), plat: contribDish.value.trim(), vin: contribWine.value.trim(), experience: contribStory.value.trim() })
       });
       const data = await res.json();
       if (!res.ok) {

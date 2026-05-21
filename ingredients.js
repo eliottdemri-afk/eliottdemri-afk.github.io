@@ -1,5 +1,4 @@
 const API_URL = "https://vinaccord-back.onrender.com";
-// const API_URL = "http://127.0.0.1:5000";
 
 const form           = document.getElementById("ingredientForm");
 const input          = document.getElementById("ingredientInput");
@@ -14,7 +13,6 @@ const resultSrc      = document.getElementById("resultSource");
 const errorBox       = document.getElementById("errorBox");
 const errorMsg       = document.getElementById("errorMsg");
 
-const DEFAULT_MSG = "Ajoutez vos ingrédients un par un, en français ou en anglais.";
 let ingredients = [];
 
 form.addEventListener("submit", e => {
@@ -36,18 +34,13 @@ function renderChips() {
   );
 }
 
-function setErrorBox(msg, isError = false) {
-  errorMsg.textContent = msg;
-  errorBox.style.borderColor = isError ? "#F5C0C0" : "rgba(255,255,255,.2)";
-  errorBox.style.background  = isError ? "rgba(200,0,0,.15)" : "rgba(255,255,255,.08)";
-}
-
-function showLoader()  { loader.hidden = false; results.hidden = true; setErrorBox(DEFAULT_MSG); }
-function showResults() { loader.hidden = true;  results.hidden = false; setErrorBox(DEFAULT_MSG); }
-function showError(m)  { loader.hidden = true;  results.hidden = true;  setErrorBox(m, true); }
+function hideAll() { loader.hidden = true; results.hidden = true; errorBox.hidden = true; }
+function showLoader()  { hideAll(); loader.hidden = false; }
+function showResults() { hideAll(); results.hidden = false; }
+function showError(m)  { hideAll(); errorMsg.textContent = m; errorBox.hidden = false; }
 
 findBtn.addEventListener("click", async () => {
-  if (ingredients.length === 0) { setErrorBox("Ajoutez au moins un ingrédient !", true); return; }
+  if (ingredients.length === 0) { showError("Ajoutez au moins un ingrédient !"); return; }
   showLoader();
   try {
     const res = await fetch(`${API_URL}/recommend`, {

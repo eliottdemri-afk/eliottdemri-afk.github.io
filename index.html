@@ -6,7 +6,7 @@
   <title>Vin/20 — Par plat</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair Display:wght@500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -45,11 +45,6 @@
       </form>
     </section>
 
-    <div class="error-box" id="errorBox">
-      <span class="error-icon">💡</span>
-      <span class="error-msg" id="errorMsg">Astuce : vous pouvez rechercher en français ou en anglais.</span>
-    </div>
-
     <div id="loader" class="loader-wrap" hidden>
       <div class="loader-spinner"></div>
       <p class="loader-text">Sélection en cours…</p>
@@ -62,6 +57,11 @@
         <p class="results-source" id="resultSource"></p>
       </div>
     </section>
+
+    <div id="errorBox" class="error-box" hidden>
+      <span class="error-icon">⚠️</span>
+      <span class="error-msg" id="errorMsg"></span>
+    </div>
 
     <div id="suggestBox" class="suggest-box" hidden>
       <p class="suggest-title">🤔 Ce plat n’est pas encore dans notre base</p>
