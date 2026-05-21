@@ -28,7 +28,9 @@ form.addEventListener("submit", e => {
 
 function renderChips() {
   chipsWrap.hidden = ingredients.length === 0;
-  chipsContainer.innerHTML = ingredients.map((ing, i) => `<span class="ing-chip">${ing}<button class="ing-chip-remove" data-index="${i}" aria-label="Supprimer">✕</button></span>`).join("");
+  chipsContainer.innerHTML = ingredients.map((ing, i) =>
+    `<span class="ing-chip">${ing}<button class="ing-chip-remove" data-index="${i}" aria-label="Supprimer">✕</button></span>`
+  ).join("");
   chipsContainer.querySelectorAll(".ing-chip-remove").forEach(btn =>
     btn.addEventListener("click", () => { ingredients.splice(parseInt(btn.dataset.index), 1); renderChips(); })
   );
@@ -36,8 +38,8 @@ function renderChips() {
 
 function setErrorBox(msg, isError = false) {
   errorMsg.textContent = msg;
-  errorBox.style.borderColor = isError ? "#F5C0C0" : "#E8E1D9";
-  errorBox.style.background  = isError ? "#FFF5F5" : "#F9F7F4";
+  errorBox.style.borderColor = isError ? "#F5C0C0" : "rgba(255,255,255,.2)";
+  errorBox.style.background  = isError ? "rgba(200,0,0,.15)" : "rgba(255,255,255,.08)";
 }
 
 function showLoader()  { loader.hidden = false; results.hidden = true; setErrorBox(DEFAULT_MSG); }
@@ -45,7 +47,7 @@ function showResults() { loader.hidden = true;  results.hidden = false; setError
 function showError(m)  { loader.hidden = true;  results.hidden = true;  setErrorBox(m, true); }
 
 findBtn.addEventListener("click", async () => {
-  if (ingredients.length === 0) { setErrorBox("Ajoutez au moins un ingrédient !", true); return; }
+  if (ingredients.length === 0) { setErrorBox("Ajoutez au moins un ingrédient !", true); return; }
   showLoader();
   try {
     const res = await fetch(`${API_URL}/recommend`, {
@@ -55,13 +57,13 @@ findBtn.addEventListener("click", async () => {
     });
     const data = await res.json();
     if (!res.ok) { showError(data.error || "Une erreur est survenue."); return; }
-    resultDish.textContent = `Ingrédients : ${ingredients.join(", ")}`;
+    resultDish.textContent = `Ingrédients : ${ingredients.join(", ")}`;
     wineList.innerHTML = data.vins.map(v => {
-      const mots = data.mots_cles && data.mots_cles[v] ? data.mots_cles[v] : [];
-      const badges = mots.map(m => `<span class="badge">${m}</span>`).join("");
-      return `<li class="wine-item"><span class="wine-dot"></span><div class="wine-info"><span class="wine-name">${v}</span>${badges ? `<div class="wine-badges">${badges}</div>` : ""}</div></li>`;
+      const mots = (data.mots_cles && data.mots_cles[v]) ? data.mots_cles[v] : [];
+      const badges = mots.length > 0 ? `<div class="wine-badges">${mots.map(m => `<span class="badge">${m}</span>`).join("")}</div>` : "";
+      return `<li class="wine-item"><span class="wine-dot"></span><div class="wine-info"><span class="wine-name">${v}</span>${badges}</div></li>`;
     }).join("");
-    resultSrc.textContent = data.couleur ? `🎨 Profil dominant : ${data.couleur}` : "🔍 Analyse par ingrédients";
+    resultSrc.textContent = data.couleur ? `🎨 Profil dominant : ${data.couleur}` : "🔍 Analyse par ingrédients";
     showResults();
   } catch {
     showError("Impossible de joindre le serveur.");
