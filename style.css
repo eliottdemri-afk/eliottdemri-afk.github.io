@@ -167,6 +167,70 @@ main { flex: 1; }
 .error-icon { font-size: 1.3rem; }
 .error-msg { font-size: .95rem; color: rgba(255,255,255,.75); }
 
+/* ── Suggestion plat manquant ── */
+.suggest-box {
+  max-width: 520px;
+  margin: 0 auto 2.5rem;
+  padding: 1.6rem;
+  background: rgba(255,255,255,.07);
+  border: 1.5px solid rgba(255,255,255,.2);
+  border-radius: var(--radius);
+  text-align: center;
+  animation: fadeUp .3s ease both;
+}
+.suggest-title {
+  font-family: "Playfair Display", serif;
+  font-size: 1.1rem;
+  color: #fff;
+  margin-bottom: .4rem;
+}
+.suggest-sub {
+  font-size: .88rem;
+  color: rgba(255,255,255,.55);
+  margin-bottom: 1.2rem;
+}
+.suggest-form {
+  display: flex;
+  flex-direction: column;
+  gap: .7rem;
+}
+.suggest-input {
+  width: 100%;
+  border: 1.5px solid rgba(255,255,255,.2);
+  border-radius: 10px;
+  padding: .8rem 1rem;
+  font: inherit;
+  font-size: .92rem;
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  outline: none;
+  transition: border-color .2s;
+}
+.suggest-input::placeholder { color: rgba(255,255,255,.35); }
+.suggest-input:focus { border-color: var(--gold); }
+.suggest-input[readonly] {
+  background: rgba(255,255,255,.04);
+  color: rgba(255,255,255,.5);
+  cursor: default;
+}
+.suggest-btn {
+  background: #fff;
+  color: var(--burgundy);
+  border: none;
+  border-radius: 999px;
+  padding: .85rem 1.2rem;
+  font: inherit;
+  font-weight: 700;
+  font-size: .95rem;
+  cursor: pointer;
+  transition: background .2s, opacity .2s, transform .15s;
+}
+.suggest-btn:hover { background: var(--gold); color: #fff; }
+.suggest-btn:active { transform: scale(.98); }
+.suggest-btn:disabled { opacity: .5; cursor: not-allowed; }
+.suggest-message { margin-top: .8rem; font-size: .9rem; color: var(--gold); font-style: italic; }
+.suggest-message.error { color: #F5C0C0; }
+
 /* ── Chips ingrédients ── */
 .chips-wrap { margin-top: 1.5rem; display: flex; flex-direction: column; align-items: center; gap: 1.2rem; }
 .ingredient-chips { display: flex; flex-wrap: wrap; gap: .5rem; justify-content: center; max-width: 600px; }

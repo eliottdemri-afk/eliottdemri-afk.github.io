@@ -14,6 +14,14 @@ const errorMsg    = document.getElementById("errorMsg");
 const histSection = document.getElementById("historySection");
 const histChips   = document.getElementById("historyChips");
 
+const suggestBox    = document.getElementById("suggestBox");
+const suggestForm   = document.getElementById("suggestForm");
+const suggestPrenom = document.getElementById("suggestPrenom");
+const suggestNom    = document.getElementById("suggestNom");
+const suggestEmail  = document.getElementById("suggestEmail");
+const suggestPlat   = document.getElementById("suggestPlat");
+const suggestMsg    = document.getElementById("suggestMsg");
+
 const contribForm  = document.getElementById("contribForm");
 const contribName  = document.getElementById("contribName");
 const contribDish  = document.getElementById("contribDish");
@@ -85,9 +93,23 @@ function setErrorBox(msg, isError = false) {
   errorBox.style.background  = isError ? "rgba(200,0,0,.15)" : "rgba(255,255,255,.08)";
 }
 
-function showLoader()  { loader.hidden = false; results.hidden = true; setErrorBox(DEFAULT_MSG); }
-function showResults() { loader.hidden = true;  results.hidden = false; setErrorBox(DEFAULT_MSG); }
-function showError(m)  { loader.hidden = true;  results.hidden = true;  setErrorBox(m, true); }
+function showLoader() {
+  loader.hidden = false;
+  results.hidden = true;
+  suggestBox.hidden = true;
+  setErrorBox(DEFAULT_MSG);
+}
+function showResults() {
+  loader.hidden = true;
+  results.hidden = false;
+  suggestBox.hidden = true;
+  setErrorBox(DEFAULT_MSG);
+}
+function showError(m) {
+  loader.hidden = true;
+  results.hidden = true;
+  setErrorBox(m, true);
+}
 
 async function doSearch(query) {
   const plat = query.trim();
@@ -101,7 +123,22 @@ async function doSearch(query) {
       body: JSON.stringify({ plat }),
     });
     const data = await res.json();
+
+    if (res.status === 404) {
+      showError(data.error || "Plat non trouvé.");
+      // Affiche le bloc suggestion
+      suggestPlat.value = plat;
+      suggestPrenom.value = "";
+      suggestNom.value = "";
+      suggestEmail.value = "";
+      suggestMsg.hidden = true;
+      suggestMsg.textContent = "";
+      suggestBox.hidden = false;
+      return;
+    }
+
     if (!res.ok) { showError(data.error || "Une erreur est survenue."); return; }
+
     resultDish.textContent = data.plat;
     wineList.innerHTML = data.vins.map(v => {
       const mots = (data.mots_cles && data.mots_cles[v]) ? data.mots_cles[v] : [];
@@ -124,12 +161,51 @@ async function doSearch(query) {
 form.addEventListener("submit", e => { e.preventDefault(); doSearch(input.value); });
 renderHistory();
 
+// ── Formulaire suggestion plat manquant ──
+if (suggestForm) {
+  suggestForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = suggestForm.querySelector(".suggest-btn");
+    suggestMsg.hidden = true;
+    btn.disabled = true;
+    btn.textContent = "Envoi en cours…";
+
+    try {
+      const res = await fetch(`${API_URL}/suggestion`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prenom: suggestPrenom.value.trim(),
+          nom:    suggestNom.value.trim(),
+          email:  suggestEmail.value.trim(),
+          plat:   suggestPlat.value.trim()
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        suggestMsg.textContent = data.error || "Impossible d’envoyer la suggestion.";
+        suggestMsg.className = "suggest-message error";
+      } else {
+        suggestMsg.textContent = "🍷 Merci ! Je reviendrai vers vous dès que ce plat est ajouté.";
+        suggestMsg.className = "suggest-message";
+        suggestForm.reset();
+      }
+    } catch {
+      suggestMsg.textContent = "Serveur indisponible, réessayez plus tard.";
+      suggestMsg.className = "suggest-message error";
+    } finally {
+      suggestMsg.hidden = false;
+      btn.disabled = false;
+      btn.textContent = "Suggérer ce plat 🍷";
+    }
+  });
+}
+
 // ── Formulaire contribution ──
 if (contribForm) {
   contribForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const btn = contribForm.querySelector(".contrib-btn");
-
     contribMsg.hidden = true;
     contribMsg.className = "contrib-message";
     btn.disabled = true;
@@ -148,7 +224,7 @@ if (contribForm) {
       });
       const data = await res.json();
       if (!res.ok) {
-        contribMsg.textContent = data.error || "Impossible d'envoyer votre contribution.";
+        contribMsg.textContent = data.error || "Impossible d’envoyer votre contribution.";
         contribMsg.classList.add("error");
       } else {
         contribMsg.textContent = "🍷 Merci ! Votre accord a bien été reçu.";

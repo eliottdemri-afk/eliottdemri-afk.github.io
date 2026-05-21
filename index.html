@@ -63,6 +63,20 @@
       </div>
     </section>
 
+    <!-- Bloc suggestion plat manquant -->
+    <div id="suggestBox" class="suggest-box" hidden>
+      <p class="suggest-title">🤔 Ce plat n’est pas encore dans notre base</p>
+      <p class="suggest-sub">Laissez vos coordonnées et je l’ajouterai manuellement !</p>
+      <form id="suggestForm" class="suggest-form" novalidate>
+        <input id="suggestPrenom" class="suggest-input" type="text" placeholder="Prénom" required />
+        <input id="suggestNom"    class="suggest-input" type="text" placeholder="Nom" required />
+        <input id="suggestEmail"  class="suggest-input" type="email" placeholder="Votre email" required />
+        <input id="suggestPlat"   class="suggest-input" type="text" readonly />
+        <button type="submit" class="suggest-btn">Suggérer ce plat 🍷</button>
+      </form>
+      <p id="suggestMsg" class="suggest-message" hidden></p>
+    </div>
+
     <section class="history-section" id="historySection" hidden>
       <p class="history-title">Recherches récentes</p>
       <div class="history-chips" id="historyChips"></div>
